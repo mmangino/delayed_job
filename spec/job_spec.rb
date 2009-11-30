@@ -53,6 +53,12 @@ describe Delayed::Job do
     Delayed::Job.first.priority.should == 5
   end
 
+  it "should pull highest priority jobs first" do
+    Delayed::Job.enqueue SimpleJob.new, 5
+    Delayed::Job.enqueue SimpleJob.new, -5
+    Delayed::Job.find(:first,:order=>Delayed::Job::NextTaskOrder).priority.should == -5
+  end
+
   it "should be able to set run_at when enqueuing items" do
     later = (Delayed::Job.db_time_now+5.minutes)
     Delayed::Job.enqueue SimpleJob.new, 5, later
